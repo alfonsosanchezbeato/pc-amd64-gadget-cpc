@@ -29,6 +29,6 @@ volumes:
       - name: writable
         role: system-data
         type: 83,0FC63DAF-8483-4772-8E79-3D69D8477DE4
-        size: 800M
+        size: 2000M
         filesystem: ext4
         filesystem-label: writable
