@@ -18,7 +18,6 @@ raid6rec \
 # ones that we don't think are useful in snappy.
 GRUB_MODULES = \
 	all_video \
-	biosdisk \
 	boot \
 	cat \
 	chain \
@@ -55,18 +54,26 @@ GRUB_MODULES = \
 	true \
 	video
 
+GRUB_MODULES_BIOS = $(GRUB_MODULES) \
+	biosdisk
+
 all:
 	dd if=$(SNAPCRAFT_STAGE)/usr/lib/grub/i386-pc/boot.img of=pc-boot.img bs=440 count=1
 	/bin/echo -n -e '\x90\x90' | dd of=pc-boot.img seek=102 bs=1 conv=notrunc
-	grub-mkimage -d $(SNAPCRAFT_STAGE)/usr/lib/grub/i386-pc/ -O i386-pc -o pc-core.img -p '(,gpt2)/EFI/ubuntu' $(GRUB_MODULES)
+	grub-mkimage -d $(SNAPCRAFT_STAGE)/usr/lib/grub/i386-pc/ -O i386-pc -o pc-core.img -p '(,gpt2)/EFI/ubuntu' $(GRUB_MODULES_BIOS)
 	# The first sector of the core image requires an absolute pointer to the
 	# second sector of the image.  Since this is always hard-coded, it means our
 	# BIOS boot partition must be defined with an absolute offset.  The
 	# particular value here is 2049, or 0x01 0x08 0x00 0x00 in little-endian.
 	/bin/echo -n -e '\x01\x08\x00\x00' | dd of=pc-core.img seek=500 bs=1 conv=notrunc
-	cp $(SNAPCRAFT_STAGE)/usr/lib/shim/shimx64.efi.dualsigned shim.efi.signed
-	cp $(SNAPCRAFT_STAGE)/usr/lib/grub/x86_64-efi-signed/grubx64.efi.signed grubx64.efi
+	cp $(SNAPCRAFT_STAGE)/usr/lib/shim/shimx64.efi.signed shim.efi.signed
+	#cp $(SNAPCRAFT_STAGE)/usr/lib/grub/x86_64-efi-signed/grubx64.efi.signed grubx64.efi
+	grub-mkimage -O x86_64-efi -o grubx64.efi \
+	    -d $(SNAPCRAFT_STAGE)/usr/lib/grub/x86_64-efi/ -p /EFI/ubuntu \
+	    -c embedded.cfg $(GRUB_MODULES)
+
 
 install:
 	install -m 644 pc-boot.img pc-core.img shim.efi.signed grubx64.efi $(DESTDIR)/
 	install -m 644 grub.conf $(DESTDIR)/
+	install -m 644 grub.cfg $(DESTDIR)/
