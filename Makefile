@@ -34,6 +34,7 @@ GRUB_MODULES = \
 	halt \
 	jpeg \
 	keystatus \
+	smbios \
 	loadenv \
 	loopback \
 	linux \
@@ -57,6 +58,14 @@ GRUB_MODULES = \
 GRUB_MODULES_BIOS = $(GRUB_MODULES) \
 	biosdisk
 
+GRUB_MODULES_UEFI = $(GRUB_MODULES) \
+	loadbios \
+	ls \
+	lsefi \
+	lsefimmap \
+	lsefisystab \
+	lssal \
+
 all:
 	dd if=$(SNAPCRAFT_STAGE)/usr/lib/grub/i386-pc/boot.img of=pc-boot.img bs=440 count=1
 	/bin/echo -n -e '\x90\x90' | dd of=pc-boot.img seek=102 bs=1 conv=notrunc
@@ -70,7 +79,7 @@ all:
 	#cp $(SNAPCRAFT_STAGE)/usr/lib/grub/x86_64-efi-signed/grubx64.efi.signed grubx64.efi
 	grub-mkimage -O x86_64-efi -o grubx64.efi \
 	    -d $(SNAPCRAFT_STAGE)/usr/lib/grub/x86_64-efi/ -p /EFI/ubuntu \
-	    -c embedded.cfg $(GRUB_MODULES)
+	    -c embedded.cfg $(GRUB_MODULES_UEFI)
 
 
 install:
