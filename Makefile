@@ -59,12 +59,7 @@ GRUB_MODULES_BIOS = $(GRUB_MODULES) \
 	biosdisk
 
 GRUB_MODULES_UEFI = $(GRUB_MODULES) \
-	loadbios \
-	ls \
-	lsefi \
-	lsefimmap \
-	lsefisystab \
-	lssal \
+	multiboot
 
 all:
 	dd if=$(SNAPCRAFT_STAGE)/usr/lib/grub/i386-pc/boot.img of=pc-boot.img bs=440 count=1
@@ -85,4 +80,4 @@ all:
 install:
 	install -m 644 pc-boot.img pc-core.img shim.efi.signed grubx64.efi $(DESTDIR)/
 	install -m 644 grub.conf $(DESTDIR)/
-	install -m 644 grub.cfg $(DESTDIR)/
+	install -m 644 acrn.out grub.cfg $(DESTDIR)/

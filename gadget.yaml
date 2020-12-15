@@ -49,6 +49,8 @@ volumes:
             target: EFI/boot/bootx64.efi
           - source: grub.cfg
             target: EFI/ubuntu/acrn/grub.cfg
+          - source: acrn.out
+            target: EFI/ubuntu/acrn/acrn.out
       - name: ubuntu-save
         role: system-save
         filesystem: ext4
